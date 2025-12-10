@@ -35,12 +35,16 @@ dependencies {
     implementation 'net.java.dev.jna:jna:5.13.0'
     implementation 'net.java.dev.jna:jna-platform:5.13.0'
 
-    implementation 'org.telegram:telegrambots:9.2.0'
+    implementation 'org.telegram:telegrambots-client:9.2.0'
+    implementation 'org.telegram:telegrambots-longpolling:9.2.0'
+    implementation 'org.telegram:telegrambots-meta:9.2.0'
     implementation 'com.github.oshi:oshi-core:6.4.8'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
     implementation 'net.lingala.zip4j:zip4j:2.11.5'
 
-    include implementation('org.telegram:telegrambots:9.2.0')
+    include implementation('org.telegram:telegrambots-client:9.2.0')
+    include implementation('org.telegram:telegrambots-longpolling:9.2.0')
+    include implementation('org.telegram:telegrambots-meta:9.2.0')
     include implementation('com.github.oshi:oshi-core:6.4.8')
     include implementation('com.fasterxml.jackson.core:jackson-databind:2.16.1')
     include implementation('net.lingala.zip4j:zip4j:2.11.5')
