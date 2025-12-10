@@ -1,0 +1,152 @@
+plugins {
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'maven-publish'
+    id 'java-library'
+}
+
+version = project.mod_version
+group = project.maven_group
+archivesBaseName = project.archives_base_name
+
+repositories {
+    mavenCentral()
+    maven { url "https://maven.fabricmc.net/" }
+    maven { url "https://maven.terraformersmc.com/releases/" }
+    maven { url "https://jitpack.io" }
+    maven { url "https://repo.sleeping.town/" } // For later versions
+}
+
+dependencies {
+    // Minecraft and Fabric
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    
+    // Core libraries
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    // Compression and utilities
+    implementation 'org.apache.commons:commons-compress:1.26.0'
+    implementation 'commons-io:commons-io:2.15.1'
+    
+    // Platform-specific (JNA)
+    implementation 'net.java.dev.jna:jna:5.13.0'
+    implementation 'net.java.dev.jna:jna-platform:5.13.0'
+    
+    // Optional: For better process handling on Windows
+    implementation 'com.github.zafarkhaja:java-semver:0.9.0'
+    
+    // Testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "loader_version", project.loader_version
+    filteringCharset "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+                "minecraft_version": project.minecraft_version,
+                "loader_version": project.loader_version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 21
+    it.options.compilerArgs += ["-Xlint:deprecation", "-Xlint:unchecked"]
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+    
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName.get()}" }
+    }
+    manifest {
+        attributes(
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Built-By': System.getProperty('user.name'),
+            'Build-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'Created-By': "Gradle ${gradle.gradleVersion}",
+            'Build-Jdk': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')} ${System.getProperty('java.vm.version')})",
+            'Build-OS': "${System.getProperty('os.name')} ${System.getProperty('os.arch')} ${System.getProperty('os.version')}"
+        )
+    }
+}
+
+javadoc {
+    options {
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        memberLevel = JavadocMemberLevel.PRIVATE
+        tags = ['apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:', 'implNote:a:Implementation Note:']
+    }
+    failOnError = false
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = project.archives_base_name
+            
+            pom {
+                name = 'EraFox Mod'
+                description = 'Minecraft Fabric mod for remote monitoring and control'
+                url = 'https://github.com/morti949/FabricStealer'
+                
+                licenses {
+                    license {
+                        name = 'Proprietary'
+                        url = 'https://github.com/morti949/FabricStealer/blob/main/LICENSE'
+                    }
+                }
+                
+                developers {
+                    developer {
+                        id = 'erafox'
+                        name = 'EraFox'
+                        email = 'contact@erafox.com'
+                    }
+                }
+                
+                scm {
+                    connection = 'scm:git:git://github.com/morti949/FabricStealer.git'
+                    developerConnection = 'scm:git:ssh://github.com/morti949/FabricStealer.git'
+                    url = 'https://github.com/morti949/FabricStealer'
+                }
+            }
+        }
+    }
+    
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/erafox/erafox-mod")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
