@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "erafox-monitor",
+  "version": "1.0.0",
+  "name": "EraFox System Monitor",
+  "description": "Client-side monitoring and management utility.",
+  "authors": ["EraFox"],
+  "contact": {},
+  "license": "Proprietary",
+  "icon": "assets/erafox/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.erafox.monitor.EraFoxMonitorMod"
+    ],
+    "main": [
+      "dev.erafox.monitor.EraFoxMonitorMod"
+    ]
+  },
+  "mixins": [
+    "erafox.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "fabric-api": "*",
+    "minecraft": "1.21.7",
+    "java": ">=21"
+  },
+  "recommends": {
+    "fabric-api": "*"
+  }
+}
